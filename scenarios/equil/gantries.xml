@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE roadpricing SYSTEM "http://www.matsim.org/files/dtd/roadpricing_v1.dtd">
+<roadpricing type="link" name="gantries">
+	<description>No description available</description>
+	<links>
+	</links>
+</roadpricing>
