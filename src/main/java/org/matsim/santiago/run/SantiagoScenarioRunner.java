@@ -213,8 +213,11 @@ public class SantiagoScenarioRunner {
 
 		config.controler().setOverwriteFileSetting( OverwriteFileSetting.failIfDirectoryExists );
 
-		config.plans().setInsistingOnUsingDeprecatedPersonAttributeFile( true );
+//		config.plans().setInsistingOnUsingDeprecatedPersonAttributeFile( true );
 		// TODO: move attributes into population file
+
+		config.plansCalcRoute().removeModeRoutingParams( TransportMode.ride );
+
 		return config;
 	}
 
