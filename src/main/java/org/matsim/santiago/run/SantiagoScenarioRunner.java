@@ -26,6 +26,7 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import org.apache.log4j.Logger;
 import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -78,7 +79,10 @@ import org.matsim.vehicles.MatsimVehicleWriter;
  * @author benjamin
  *
  */
-public class SantiagoScenarioRunner {
+class SantiagoScenarioRunner {
+	private static final Logger log = Logger.getLogger( SantiagoScenarioRunner.class ) ;
+
+	// yyyyyy FIXME static non-final variables are dangerous; change to something else
 
 	/**GENERAL**/
 	private static String configFile;
@@ -134,7 +138,7 @@ public class SantiagoScenarioRunner {
 		if(mapActs2Links) mapActivities2properLinks(scenario);
 
 		//Adding the toll links file in the config
-		RoadPricingConfigGroup rpcg = ConfigUtils.addOrGetModule( scenario.getConfig(), RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class );
+		RoadPricingConfigGroup rpcg = ConfigUtils.addOrGetModule( scenario.getConfig(), RoadPricingConfigGroup.class );
 		rpcg.setTollLinksFile(gantriesFile);
 
 		//Adding randomness to the router, sigma = 3
@@ -171,10 +175,26 @@ public class SantiagoScenarioRunner {
 		return controler;
 	}
 	static Scenario prepareScenario( Config config ){
-		return ScenarioUtils.loadScenario(config );
+		Scenario scenario = ScenarioUtils.loadScenario(config );
+
+		for( Link link : scenario.getNetwork().getLinks().values() ){
+			if ( link.getLength() <=0. ) {
+				log.warn( "found link with length=" + link.getLength() + "; linkId=" + link.getId() + "; making longer ..." ) ;
+				link.setLength( 1. );
+			}
+			if ( !( link.getFreespeed() <= Double.MAX_VALUE && link.getFreespeed() >0 ) ) {
+				double val = 1000. ;
+				log.warn( "found link with speed=" + link.getFreespeed() + "; linkId=" + link.getId() + "; setting to " + val );
+				link.setFreespeed( val );
+			}
+		}
+
+		return scenario ;
 	}
 	static Config prepareConfig( String[] args ){
 
+
+		// FIXME yyyy everything except for the config file argument should be typed. kai, oct'19
 		if (args.length==7){ //ONLY FOR CMD CASES
 
 			configFile = args[0]; //COMPLETE PATH TO CONFIG.

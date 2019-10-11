@@ -18,52 +18,52 @@ public class StgoAgentSpecificActivitySchedulingConfigGroup extends ReflectiveCo
 	private boolean removeNetworkSpecificInformation = false;
 	private boolean adjustPopulation = true; //only to write the start and end times as person attributes in the population.
 
-	@StringGetter( "activityDurationBin" )
+//	@StringGetter( "activityDurationBin" )
 	public double getActivityDurationBin() {
 		return activityDurationBin;
 	}
 	
-	@StringSetter( "activityDurationBin" )
+//	@StringSetter( "activityDurationBin" )
 	public void setActivityDurationBin(double activityDurationBin) {
 		this.activityDurationBin = activityDurationBin;
 	}
 	
-	@StringGetter( "tolerance" )
+//	@StringGetter( "tolerance" )
 	public double getTolerance() {
 		return tolerance;
 	}
 	
-	@StringSetter( "tolerance" )
+//	@StringSetter( "tolerance" )
 	public void setTolerance(double tolerance) {
 		this.tolerance = tolerance;
 	}
 	
-	@StringGetter( "removeNetworkSpecificInformation" )
+//	@StringGetter( "removeNetworkSpecificInformation" )
 	public boolean isRemoveNetworkSpecificInformation() {
 		return removeNetworkSpecificInformation;
 	}
 	
-	@StringSetter( "removeNetworkSpecificInformation" )
+//	@StringSetter( "removeNetworkSpecificInformation" )
 	public void setRemoveNetworkSpecificInformation(boolean removeNetworkSpecificInformation) {
 		this.removeNetworkSpecificInformation = removeNetworkSpecificInformation;
 	}
 
-	@StringGetter( "adjustPopulation" )
+//	@StringGetter( "adjustPopulation" )
 	public boolean isAdjustPopulation() {
 		return adjustPopulation;
 	}
 
-	@StringSetter( "adjustPopulation" )
+//	@StringSetter( "adjustPopulation" )
 	public void setAdjustPopulation(boolean adjustPopulation) {
 		this.adjustPopulation = adjustPopulation;
 	}
 
-	@StringGetter( "useAgentSpecificActivityScheduling" )
+//	@StringGetter( "useAgentSpecificActivityScheduling" )
 	public boolean isUseAgentSpecificActivityScheduling() {
 		return useAgentSpecificActivityScheduling;
 	}
 
-	@StringSetter( "useAgentSpecificActivityScheduling" )
+//	@StringSetter( "useAgentSpecificActivityScheduling" )
 	public void setUseAgentSpecificActivityScheduling(boolean useAgentSpecificActivityScheduling) {
 		this.useAgentSpecificActivityScheduling = useAgentSpecificActivityScheduling;
 	}

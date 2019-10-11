@@ -14,7 +14,8 @@ import org.matsim.santiago.utils.StgoPopulationTools;
  *
  */
 public class StgoAgentSpecificActivitySchedulingModule extends AbstractModule {
-	
+	// yyyyyy what makes this an AbstractModule?  Functionality could be run by static method even before Controler is instantiated.
+
 	private static final Logger log = Logger.getLogger(StgoAgentSpecificActivitySchedulingModule.class);	
 	private final StgoAgentSpecificActivitySchedulingConfigGroup asasConfigGroup;
 	
