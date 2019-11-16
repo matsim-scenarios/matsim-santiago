@@ -19,9 +19,7 @@
 
 package org.matsim.santiago.run;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -43,18 +41,16 @@ import org.matsim.contrib.cadyts.car.CadytsContext;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
 import org.matsim.contrib.roadpricing.RoadPricingConfigGroup;
 import org.matsim.contrib.roadpricing.RoadPricingModule;
+import org.matsim.core.config.CommandLine;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.MatsimServices;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
-import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl.Builder;
 import org.matsim.core.replanning.modules.ReRoute;
@@ -72,85 +68,81 @@ import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 
-import org.matsim.santiago.SantiagoScenarioConstants;
-import org.matsim.vehicles.MatsimVehicleWriter;
+import org.matsim.santiago.utils.SantiagoScenarioConstants;
+
+import static org.matsim.core.config.groups.PlanCalcScoreConfigGroup.*;
 
 /**
  * @author benjamin
  *
  */
-class SantiagoScenarioRunner {
+public class SantiagoScenarioRunner {
+	static final String DOING_MODE_CHOICE = "doingModeChoice";
+	static final String MAPPING_ACTIVITIES_TO_CAR_LINKS = "mappingActivitiesToCarLinks";
+	static final String USING_CADYTS = "usingCadyts";
+
 	private static final Logger log = Logger.getLogger( SantiagoScenarioRunner.class ) ;
 
-	// yyyyyy FIXME static non-final variables are dangerous; change to something else
-
-	/**GENERAL**/
-	private static String configFile;
-	private static String gantriesFile;
-	private static int policy;
-	private static int sigma;
-	private static boolean doModeChoice;
-	private static boolean mapActs2Links;
-	private static boolean cadyts;
-	/***/
-
-	private static String simulationStep = "StepTEST";
-	private static String caseName = "baseCase1pct";
-	private static String inputPath = "../../../runs-svn/org.matsim.santiago/"+caseName+"/";
-
-
-
 	public static void main(String[] args){
-		// yyyy TODO get rid of untyped args
-
 
 		Config config = prepareConfig( args );
-		// note: a large number of config modification is included later.  Preferably change at some point
+		// note: a large number of config modification is included later.  Maybe change at some point?
 
-
-		Scenario scenario = prepareScenario( config );
-
-
-		Controler controler = prepareControler( scenario );
-
-
-		//Run!
-		controler.run();
+		run( config, args );
 
 
 	}
-	static Controler prepareControler( Scenario scenario ){
-		Controler controler = new Controler(scenario);
+	static void run( Config config, String[] args ){
+		CommandLine cmd = ConfigUtils.getCommandLine( args ) ;
 
-		// adding other network modes than car requires some router; here, the same values as for car are used
-		setNetworkModeRouting(controler);
+		Scenario scenario = ScenarioUtils.loadScenario( config );
 
-		// adding pt fare
-		controler.getEvents().addHandler(new PTFareHandler(controler, doModeChoice, scenario.getPopulation()) );
-
-		// adding basic strategies for car and non-car users
-		setBasicStrategiesForSubpopulations(controler);
-
-		// adding subtour mode choice strategies for car and non-car users
-		if(doModeChoice) setModeChoiceForSubpopulations(controler);
+		for( Link link : scenario.getNetwork().getLinks().values() ){
+			if ( link.getLength() <=0. ) {
+				log.warn( "found link with length=" + link.getLength() + "; linkId=" + link.getId() + "; making longer ..." ) ;
+				link.setLength( 1. );
+			}
+			if ( !( link.getFreespeed() <= Double.MAX_VALUE && link.getFreespeed() >0 ) ) {
+				double val = 1000. ;
+				log.warn( "found link with speed=" + link.getFreespeed() + "; linkId=" + link.getId() + "; setting to " + val );
+				link.setFreespeed( val );
+			}
+		}
 
 		// mapping agents' activities to links on the road network to avoid being stuck on the transit network
-		if(mapActs2Links) mapActivities2properLinks(scenario);
+		boolean mapActs2Links = Boolean.parseBoolean( cmd.getOption( MAPPING_ACTIVITIES_TO_CAR_LINKS ).orElse( "false" ) ) ;
+		if(mapActs2Links){
+			mapActivities2properLinks( scenario );
+		}
 
-		//Adding the toll links file in the config
+		CommandLine cmd1 = ConfigUtils.getCommandLine( args ) ;
+		Controler controler = new Controler( scenario );
+
+		// adding other network modes than car requires some router; here, the same values as for car are used
+		setNetworkModeRouting( controler );
+
+		// adding pt fare
+		boolean doModeChoice = Boolean.parseBoolean( cmd1.getOption( DOING_MODE_CHOICE ).orElse( "false" ) ) ;
+		controler.getEvents().addHandler(new PTFareHandler( controler, doModeChoice, scenario.getPopulation()) );
+
+		// adding basic strategies for car and non-car users
+		setBasicStrategiesForSubpopulations( controler );
+
+		// adding subtour mode choice strategies for car and non-car users
+		if(doModeChoice){
+			setModeChoiceForSubpopulations( controler );
+		}
 		RoadPricingConfigGroup rpcg = ConfigUtils.addOrGetModule( scenario.getConfig(), RoadPricingConfigGroup.class );
-		rpcg.setTollLinksFile(gantriesFile);
+		if ( rpcg.getTollLinksFile()!=null && !rpcg.getTollLinksFile().equals( "" ) ){
+			// found road pricing file, so am switching on road pricing:
+			controler.addOverridingModule( new RoadPricingModule() );
+		}
 
-		//Adding randomness to the router, sigma = 3
-		scenario.getConfig().plansCalcRoute().setRoutingRandomness(sigma );
-
-		controler.addOverridingModule(new RoadPricingModule() );
-
-
+		boolean cadyts = Boolean.parseBoolean( cmd1.getOption( USING_CADYTS ).orElse( "false" ) ) ;
 		if (cadyts){
 			controler.addOverridingModule(new CadytsCarModule() );
 			// include cadyts into the plan scoring (this will add the cadyts corrections to the scores)
-			controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
+			controler.setScoringFunctionFactory( new ScoringFunctionFactory() {
 				@Inject CadytsContext cadytsContext;
 				@Inject ScoringParametersForPerson parameters;
 				@Override
@@ -168,81 +160,56 @@ class SantiagoScenarioRunner {
 
 					return scoringFunctionAccumulator;
 				}
-			}) ;
-
+			} ) ;
 
 		}
-		return controler;
-	}
-	static Scenario prepareScenario( Config config ){
-		Scenario scenario = ScenarioUtils.loadScenario(config );
 
-		for( Link link : scenario.getNetwork().getLinks().values() ){
-			if ( link.getLength() <=0. ) {
-				log.warn( "found link with length=" + link.getLength() + "; linkId=" + link.getId() + "; making longer ..." ) ;
-				link.setLength( 1. );
-			}
-			if ( !( link.getFreespeed() <= Double.MAX_VALUE && link.getFreespeed() >0 ) ) {
-				double val = 1000. ;
-				log.warn( "found link with speed=" + link.getFreespeed() + "; linkId=" + link.getId() + "; setting to " + val );
-				link.setFreespeed( val );
-			}
-		}
-
-		return scenario ;
+		//Run!
+		controler.run();
 	}
 	static Config prepareConfig( String[] args ){
 
-
-		// FIXME yyyy everything except for the config file argument should be typed. kai, oct'19
-		if (args.length==7){ //ONLY FOR CMD CASES
-
-			configFile = args[0]; //COMPLETE PATH TO CONFIG.
-			gantriesFile = args[1]; //COMPLETE PATH TO TOLL LINKS FILE
-			policy = Integer.parseInt(args[2]) ; //POLICY? - 0: BASE CASE, 1: CORDON.
-			sigma = Integer.parseInt(args[3]); //SIGMA.
-			doModeChoice = Boolean.parseBoolean(args[4]); //DOMODECHOICE?
-			mapActs2Links = Boolean.parseBoolean(args[5]); //MAPACTS2LINKS?
-			cadyts = Boolean.parseBoolean(args[6]); //CADYTS?
-
-		} else {
-
-//			configFile=inputPath + "config_" + caseName + ".xml" ;
+		Gbl.assertNotNull( args );
+		Gbl.assertIf( args.length>0 );
+		// yy there used to be an execution path when args where not there; this is currently gone; could be resurrected.  On the
+		// other hand, from GUI one does not need it, and from IDE one can run test cases.  kai, nov'19
 //			configFile = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/cl/santiago/v2b/santiago/config_baseCase10pct.xml" ;
-			configFile = "../../public-svn/matsim/scenarios/countries/cl/santiago/v2b/santiago/config_baseCase10pct.xml" ;
-			// TODO: make config file local
-			// TODO: then set config context to https location (check how done in matsim-berlin)
-			// TODO: prepare a 1pct version
 
-//			gantriesFile = inputPath + "inputFor" + simulationStep + "/gantries.xml";
-			gantriesFile = "gantries.xml"; // relative to config file directory
-
-			policy=0;
-			sigma=3 ;
-			doModeChoice=true; //TODO:BE AWARE OF THIS!
-			mapActs2Links=false;
-			cadyts=false; //TODO:BE AWARE OF THIS!
-
-		}
-
-		if(policy == 1){
-			//TODO: CHANGE THE TollLinksFile IN THE CONFIG.
-		}
-
-		Config config = ConfigUtils.loadConfig(configFile );
-
-		config.controler().setOverwriteFileSetting( OverwriteFileSetting.failIfDirectoryExists );
-
-//		config.plans().setInsistingOnUsingDeprecatedPersonAttributeFile( true );
-		// TODO: move attributes into population file
+		Config config = ConfigUtils.loadConfig( args ) ;
 
 		config.plansCalcRoute().removeModeRoutingParams( TransportMode.ride );
+
+		// one could combine the following into a loop over the activity types, but I want to leave the option to set opening/closing times to some of them.
+		// kai, nov'19
+
+		config.planCalcScore().addActivityParams( new ActivityParams("busi0.5H").setTypicalDuration( 1800. ) );
+		config.planCalcScore().addActivityParams( new ActivityParams("educ0.5H").setTypicalDuration( 1800. ) );
+		config.planCalcScore().addActivityParams( new ActivityParams("heal0.5H").setTypicalDuration( 1800. ) );
+		config.planCalcScore().addActivityParams( new ActivityParams("home0.5H").setTypicalDuration( 1800. ) );
+		config.planCalcScore().addActivityParams( new ActivityParams("leis0.5H").setTypicalDuration( 1800. ) );
+		config.planCalcScore().addActivityParams( new ActivityParams("othe0.5H").setTypicalDuration( 1800. ) );
+		config.planCalcScore().addActivityParams( new ActivityParams("shop0.5H").setTypicalDuration( 1800. ) );
+		config.planCalcScore().addActivityParams( new ActivityParams("visi0.5H").setTypicalDuration( 1800. ) );
+		config.planCalcScore().addActivityParams( new ActivityParams("work0.5H").setTypicalDuration( 1800. ) );
+
+		for ( int ii=1 ; ii<=24 ; ii++ ) {
+			config.planCalcScore().addActivityParams( new ActivityParams( "busi" + ii + ".0H").setTypicalDuration( ii*3600. ) );
+			config.planCalcScore().addActivityParams( new ActivityParams( "educ" + ii + ".0H").setTypicalDuration( ii*3600. ) );
+			config.planCalcScore().addActivityParams( new ActivityParams( "heal" + ii + ".0H").setTypicalDuration( ii*3600. ) );
+			config.planCalcScore().addActivityParams( new ActivityParams( "home" + ii + ".0H").setTypicalDuration( ii*3600. ) );
+			config.planCalcScore().addActivityParams( new ActivityParams( "leis" + ii + ".0H").setTypicalDuration( ii*3600. ) );
+			config.planCalcScore().addActivityParams( new ActivityParams( "othe" + ii + ".0H").setTypicalDuration( ii*3600. ) );
+			config.planCalcScore().addActivityParams( new ActivityParams( "shop" + ii + ".0H").setTypicalDuration( ii*3600. ) );
+			config.planCalcScore().addActivityParams( new ActivityParams( "visi" + ii + ".0H").setTypicalDuration( ii*3600. ) );
+			config.planCalcScore().addActivityParams( new ActivityParams( "work" + ii + ".0H").setTypicalDuration( ii*3600. ) );
+		}
+
 
 		return config;
 	}
 
 
-	private static void mapActivities2properLinks(Scenario scenario) {
+	static void mapActivities2properLinks( Scenario scenario ) {
 		Network subNetwork = getNetworkWithProperLinksOnly(scenario.getNetwork());
 		for(Person person : scenario.getPopulation().getPersons().values()){
 			for (Plan plan : person.getPlans()) {
@@ -299,7 +266,7 @@ class SantiagoScenarioRunner {
 		});
 	}
 
-	private static void setBasicStrategiesForSubpopulations(MatsimServices controler) {
+	static void setBasicStrategiesForSubpopulations( MatsimServices controler ) {
 		setReroute("carAvail", controler);
 		setChangeExp("carAvail", controler);
 		setReroute(null, controler);
@@ -308,7 +275,7 @@ class SantiagoScenarioRunner {
 
 	private static void setChangeExp(String subpopName, MatsimServices controler) {
 		StrategySettings changeExpSettings = new StrategySettings();
-		changeExpSettings.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.toString());
+		changeExpSettings.setStrategyName( DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta );
 		changeExpSettings.setSubpopulation(subpopName);
 //		changeExpSettings.setWeight(0.85);
 		changeExpSettings.setWeight(0.7); //TODO: BE AWARE OF THIS!!!
@@ -317,13 +284,13 @@ class SantiagoScenarioRunner {
 
 	private static void setReroute(String subpopName, MatsimServices controler) {
 		StrategySettings reRouteSettings = new StrategySettings();
-		reRouteSettings.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.ReRoute.toString());
+		reRouteSettings.setStrategyName( DefaultPlanStrategiesModule.DefaultStrategy.ReRoute );
 		reRouteSettings.setSubpopulation(subpopName);
 		reRouteSettings.setWeight(0.15);
 		controler.getConfig().strategy().addStrategySettings(reRouteSettings);
 	}
 
-	private static void setModeChoiceForSubpopulations(final Controler controler) {
+	static void setModeChoiceForSubpopulations( final Controler controler ) {
 		final String nameMcCarAvail = "SubtourModeChoice_".concat("carAvail");
 		StrategySettings modeChoiceCarAvail = new StrategySettings();
 		modeChoiceCarAvail.setStrategyName(nameMcCarAvail);

@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 
-import org.matsim.santiago.network.GetLinksOSMCategories;
+import org.matsim.santiago.prepare.network.GetLinksOSMCategories;
 
 /**
  * Only for cars.

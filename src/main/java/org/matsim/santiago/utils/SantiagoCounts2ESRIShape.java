@@ -11,7 +11,6 @@ import org.matsim.core.utils.gis.PointFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.io.IOUtils;
 import org.opengis.feature.simple.SimpleFeature;
-import org.matsim.santiago.SantiagoScenarioConstants;
 
 public class SantiagoCounts2ESRIShape {
 

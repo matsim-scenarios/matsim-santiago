@@ -42,8 +42,8 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
-import org.matsim.santiago.SantiagoScenarioConstants.SubpopulationName;
-import org.matsim.santiago.SantiagoScenarioConstants.SubpopulationValues;
+import org.matsim.santiago.utils.SantiagoScenarioConstants.SubpopulationName;
+import org.matsim.santiago.utils.SantiagoScenarioConstants.SubpopulationValues;
 
 
 public class PopulationAnalysis {

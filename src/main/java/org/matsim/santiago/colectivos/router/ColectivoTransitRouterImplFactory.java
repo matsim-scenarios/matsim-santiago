@@ -31,7 +31,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 import com.google.inject.name.Named;
 
-import org.matsim.santiago.SantiagoScenarioConstants;
+import org.matsim.santiago.utils.SantiagoScenarioConstants;
 
 import javax.inject.Inject;
 import javax.inject.Provider;

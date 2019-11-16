@@ -57,8 +57,7 @@
 //import org.matsim.core.router.TripRouter;
 //import org.matsim.core.scenario.ScenarioUtils;
 //
-//import org.matsim.santiago.SantiagoScenarioConstants;
-//import org.matsim.santiago.agentSpecificActivityScheduling.AgentSpecificActivitySchedulingModule;
+//import org.matsim.santiago.utils.SantiagoScenarioConstants;
 //
 ///**
 // * @author benjamin

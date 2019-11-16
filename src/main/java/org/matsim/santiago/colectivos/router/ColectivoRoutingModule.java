@@ -2,7 +2,7 @@ package org.matsim.santiago.colectivos.router;
 
 import com.google.inject.name.Named;
 
-import org.matsim.santiago.SantiagoScenarioConstants;
+import org.matsim.santiago.utils.SantiagoScenarioConstants;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;

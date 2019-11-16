@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 
-import org.matsim.santiago.network.GetTollwayAndSecondaryLinks;
+import org.matsim.santiago.prepare.network.GetTollwayAndSecondaryLinks;
 
 /**
  * Only for cars.

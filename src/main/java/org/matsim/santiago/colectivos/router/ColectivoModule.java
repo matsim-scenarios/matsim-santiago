@@ -11,7 +11,7 @@ import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 
 import com.google.inject.name.Names;
 
-import org.matsim.santiago.SantiagoScenarioConstants;
+import org.matsim.santiago.utils.SantiagoScenarioConstants;
 
 public class ColectivoModule extends AbstractModule {
 
