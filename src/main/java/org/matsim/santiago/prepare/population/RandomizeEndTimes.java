@@ -89,8 +89,9 @@ public class RandomizeEndTimes {
 			for(PlanElement pe : person.getSelectedPlan().getPlanElements()){
 				if(pe instanceof Activity){
 					Activity act = (Activity) pe;
-					if(act.getStartTime() != Time.UNDEFINED_TIME && act.getEndTime() != Time.UNDEFINED_TIME){
-						if(act.getEndTime() - act.getStartTime() == 0){
+//					if(act.getStartTime() != Time.UNDEFINED_TIME && act.getEndTime() != Time.UNDEFINED_TIME){
+					if(act.getStartTime().isDefined() && act.getEndTime().isDefined() ) {
+						if(act.getEndTime().seconds() - act.getStartTime().seconds() == 0){
 							timeShift += 1800.;
 						}
 					}
@@ -103,16 +104,16 @@ public class RandomizeEndTimes {
 			double delta = 0;
 			while(delta == 0){
 				delta = createRandomEndTime(random, standardDeviation);
-				if(firstAct.getEndTime() + delta < 0){
+				if(firstAct.getEndTime().seconds() + delta < 0){
 					delta = 0;
 				}
-				if(lastAct.getStartTime() + delta + timeShift > 24 * 3600){
+				if(lastAct.getStartTime().seconds() + delta + timeShift > 24 * 3600){
 					delta = 0;
 				}
-				if(lastAct.getEndTime() != Time.UNDEFINED_TIME){
+				if(lastAct.getEndTime().isDefined() ) { // != Time.UNDEFINED_TIME){
 					// if an activity end time for last activity exists, it should be 24:00:00
 					// in order to avoid zero activity durations, this check is done
-					if(lastAct.getStartTime() + delta + timeShift >= lastAct.getEndTime()){
+					if(lastAct.getStartTime().seconds() + delta + timeShift >= lastAct.getEndTime().seconds() ){
 						delta = 0;
 					}
 				}
@@ -124,10 +125,10 @@ public class RandomizeEndTimes {
 					Activity act = (Activity)pe;
 					if(!act.getType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)){
 						if(person.getSelectedPlan().getPlanElements().indexOf(act) > 0){
-							act.setStartTime(act.getStartTime() + delta);
+							act.setStartTime(act.getStartTime().seconds() + delta);
 						}
 						if(person.getSelectedPlan().getPlanElements().indexOf(act) < person.getSelectedPlan().getPlanElements().size()-1){
-							act.setEndTime(act.getEndTime() + delta);
+							act.setEndTime(act.getEndTime().seconds() + delta);
 						}
 					}
 //					else {

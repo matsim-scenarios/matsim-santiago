@@ -403,7 +403,7 @@ public class CSVToPlansTry {
 						posterior = popFactory.createActivityFromCoord(proposito, destination);
 						double startTime = viaje.getEndTime();
 						lastActivity = lastActivity == null ? anterior : lastActivity;
-						if(startTime < lastActivity.getEndTime()){
+						if(startTime < lastActivity.getEndTime().seconds()){
 							startTime += 24*3600;
 						}
 						posterior.setStartTime(startTime);

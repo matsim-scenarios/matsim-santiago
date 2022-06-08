@@ -85,12 +85,12 @@ public class ActivityClassifierTry {
 			Activity lastAct = (Activity) pes.get(planElementsSize - 1);
 			if(firstAct == null || lastAct == null)	throw new RuntimeException("First or last plan element is not an instance of activity. Aborting...");
 			
-			double firstActDur = firstAct.getEndTime();
+			double firstActDur = firstAct.getEndTime().seconds();
 			if(firstAct.getType().equals(lastAct.getType())){ // same first and last act
 				isFirstAndLastActSame = true;
 				// If lastAct.getStartTime() is after midnight, it eats into the jointActDur which is what we want.
 				// It only becomes implausible if lastAct.getStartTime() > firstAct.getEndTime() which would mean negative sleep.
-				double jointActDur = firstActDur +  Time.MIDNIGHT - lastAct.getStartTime();
+				double jointActDur = firstActDur +  Time.MIDNIGHT - lastAct.getStartTime().seconds();
 				if(jointActDur == 0.) throw new RuntimeException("First and last activities are of the same type, yet total duration is 0.0. Aborting...");
 				overnightTypDur = Math.max(Math.floor(jointActDur/3600), 0.5) * 3600;
 			} else { // different first and last act
@@ -106,8 +106,8 @@ public class ActivityClassifierTry {
 				PlanElement pe = pes.get(ii);
 				if(pe instanceof Leg){
 					Leg leg = popFactory.createLeg(((Leg)pe).getMode());
-					leg.setDepartureTime(((Leg)pe).getDepartureTime() + timeShift);
-					leg.setTravelTime(((Leg)pe).getTravelTime());
+					leg.setDepartureTime(((Leg)pe).getDepartureTime().seconds() + timeShift);
+					leg.setTravelTime(((Leg)pe).getTravelTime().seconds());
 					planOut.addLeg(leg);
 				} else {
 					double typDur = Double.NEGATIVE_INFINITY;
@@ -116,34 +116,34 @@ public class ActivityClassifierTry {
 						if(isFirstAndLastActSame){ // same first and last act
 							actType = firstAct.getType().substring(0,4).concat(overnightTypDur/3600+"H");
 							Activity hAct = popFactory.createActivityFromCoord(actType, firstAct.getCoord());
-							if(ii==0) hAct.setEndTime(firstAct.getEndTime()); // first act --> only end time (no need for any time shift for first act)
-							else hAct.setStartTime(lastAct.getStartTime() + timeShift); // last act --> only start time
+							if(ii==0) hAct.setEndTime(firstAct.getEndTime().seconds()); // first act --> only end time (no need for any time shift for first act)
+							else hAct.setStartTime(lastAct.getStartTime().seconds() + timeShift); // last act --> only start time
 							planOut.addActivity(hAct);
 							typDur = overnightTypDur;
 						} else { // different first and last act
 							if(ii == 0){ // first act
-								double dur = firstAct.getEndTime();
+								double dur = firstAct.getEndTime().seconds();
 								Tuple<Double, Double> durAndTimeShift = durationConsistencyCheck(dur);
 								typDur = Math.max(Math.floor(durAndTimeShift.getFirst()/3600), 0.5) * 3600;
 								timeShift += durAndTimeShift.getSecond();
 								actType = firstAct.getType().substring(0,4).concat(typDur/3600+"H");
 								Activity act = popFactory.createActivityFromCoord(actType, firstAct.getCoord());
-								act.setEndTime(firstAct.getEndTime() + timeShift); //time shift is also required for first activity, e.g. when activities have a end time of 0.
+								act.setEndTime(firstAct.getEndTime().seconds() + timeShift); //time shift is also required for first activity, e.g. when activities have a end time of 0.
 								planOut.addActivity(act);
 							} else { // last act
-								if(lastAct.getStartTime() >= Time.MIDNIGHT) {
+								if(lastAct.getStartTime().seconds() >= Time.MIDNIGHT) {
 									// skipping the person, one could skip only this activity (and the connecting leg) which could generate other prob like 
 									// home1 - car - home2 - pt - work will reduce to home1 -car- home2 and home1 and home2 are not wrapped.
 									skipPerson = true;
 									break;
 								}
-								double dur = Time.MIDNIGHT - lastAct.getStartTime();
+								double dur = Time.MIDNIGHT - lastAct.getStartTime().seconds();
 								Tuple<Double, Double> durAndTimeShift = durationConsistencyCheck(dur);
 								typDur = Math.max(Math.floor(durAndTimeShift.getFirst()/3600), 0.5) * 3600;
 								timeShift += durAndTimeShift.getSecond();
 								actType = lastAct.getType().substring(0,4).concat(typDur/3600+"H");
 								Activity act = popFactory.createActivityFromCoord(actType, lastAct.getCoord());
-								act.setStartTime(lastAct.getStartTime()+ timeShift);
+								act.setStartTime(lastAct.getStartTime().seconds()+ timeShift);
 								planOut.addActivity(act);
 							}
 						}
@@ -156,14 +156,14 @@ public class ActivityClassifierTry {
 //							actType = currentAct.getType();
 //							typDur = Time.UNDEFINED_TIME;
 						} else {
-							double dur = currentAct.getEndTime() - currentAct.getStartTime();
+							double dur = currentAct.getEndTime().seconds() - currentAct.getStartTime().seconds();
 							Tuple<Double, Double> durAndTimeShift = durationConsistencyCheck(dur);
 							typDur = Math.max(Math.floor(durAndTimeShift.getFirst()/3600), 0.5) * 3600;
 							actType = currentAct.getType().substring(0, 4).concat(typDur/3600+"H");
 							Activity a1 = popFactory.createActivityFromCoord(actType, cord);
-							a1.setStartTime(currentAct.getStartTime()+ timeShift); // previous time shift
+							a1.setStartTime(currentAct.getStartTime().seconds()+ timeShift); // previous time shift
 							timeShift += durAndTimeShift.getSecond();
-							a1.setEndTime(currentAct.getEndTime() + timeShift); 
+							a1.setEndTime(currentAct.getEndTime().seconds() + timeShift);
 							planOut.addActivity(a1);
 						}
 					}

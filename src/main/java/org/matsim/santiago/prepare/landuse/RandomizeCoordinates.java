@@ -296,8 +296,8 @@ public class RandomizeCoordinates {
 
 					Activity actOut = newPlans.getFactory().createActivityFromCoord(actType, actIn.getCoord());
 						planIn.addActivity(actOut);				
-						actOut.setEndTime(actIn.getEndTime());
-						actOut.setStartTime(actIn.getStartTime());
+						actOut.setEndTime(actIn.getEndTime().seconds());
+						actOut.setStartTime(actIn.getStartTime().seconds());
 
 					}
 
@@ -705,15 +705,15 @@ public class RandomizeCoordinates {
 						
 							Activity actIn = newPlans.getFactory().createActivityFromCoord(tempType, newCoord);
 							planIn.addActivity(actIn);
-							actIn.setEndTime(actTemp.getEndTime());
-							actIn.setStartTime(actTemp.getStartTime());
+							actIn.setEndTime(actTemp.getEndTime().seconds());
+							actIn.setStartTime(actTemp.getStartTime().seconds());
 							
 						} else {
 							
 							Activity actIn = newPlans.getFactory().createActivityFromCoord(tempType, tempCoord);
 							planIn.addActivity(actIn);
-							actIn.setEndTime(actTemp.getEndTime());
-							actIn.setStartTime(actTemp.getStartTime());
+							actIn.setEndTime(actTemp.getEndTime().seconds());
+							actIn.setStartTime(actTemp.getStartTime().seconds());
 							
 						}
 						

@@ -51,7 +51,7 @@ public class WriteEndTimesFromPopulation {
 							Activity actIn = (Activity)pe;							 
 
 							pw.print(p.getId().toString() + ";" + actIn.getEndTime());						 
-							if (actIn.getEndTime() == Double.NEGATIVE_INFINITY && !actIn.getType().equals("pt interaction")){pw.println("; ;");}
+							if (actIn.getEndTime().seconds() == Double.NEGATIVE_INFINITY && !actIn.getType().equals("pt interaction")){pw.println("; ;");}
 						}else{
 
 

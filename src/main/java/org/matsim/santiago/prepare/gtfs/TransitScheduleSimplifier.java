@@ -695,9 +695,9 @@ public class TransitScheduleSimplifier{
 				
 				TransitRoute route = transitRoutes.get(Id.create(listOfRoutes[j], TransitRoute.class));
 				TransitRouteStop stop = route.getStops().get(i);
-				arrivalOffset += stop.getArrivalOffset()*route.getDepartures().size();
+				arrivalOffset += stop.getArrivalOffset().seconds()*route.getDepartures().size();
 				arrCounter++;
-				departureOffset += stop.getDepartureOffset()*route.getDepartures().size();
+				departureOffset += stop.getDepartureOffset().seconds()*route.getDepartures().size();
 				depCounter++;
 //				nDepartures += route.getDepartures().size();
 				
@@ -734,8 +734,8 @@ public class TransitScheduleSimplifier{
 				TransitRouteStop stop = tr.getStop(facility);
 
 				if(tr.getStops().indexOf(stop) > tr.getStops().indexOf(tr.getStop(f))){
-					arrivalOffset += stop.getArrivalOffset() - tr.getStop(f).getDepartureOffset();
-					departureOffset += stop.getDepartureOffset() - tr.getStop(f).getDepartureOffset();
+					arrivalOffset += stop.getArrivalOffset().seconds() - tr.getStop(f).getDepartureOffset().seconds();
+					departureOffset += stop.getDepartureOffset().seconds() - tr.getStop(f).getDepartureOffset().seconds();
 				}
 					
 			}
@@ -791,7 +791,7 @@ public class TransitScheduleSimplifier{
 							Integer.toString(mergedTransitRoute.getDepartures().size());
 					
 					Departure dep = factory.createDeparture(Id.create(departureId, Departure.class),
-							departure.getDepartureTime() + transitRoute.getStop(startTransitRouteStop.getStopFacility()).getDepartureOffset());
+							departure.getDepartureTime() + transitRoute.getStop(startTransitRouteStop.getStopFacility()).getDepartureOffset().seconds());
 					dep.setVehicleId(departure.getVehicleId());
 					
 					mergedTransitRoute.addDeparture(dep);
@@ -818,7 +818,7 @@ public class TransitScheduleSimplifier{
 							Integer.toString(mergedTransitRoute.getDepartures().size());
 					
 					Departure dep = factory.createDeparture(Id.create(departureId, Departure.class),
-							departure.getDepartureTime() + transitRoute.getStop(routeProfile.get(0)).getDepartureOffset());
+							departure.getDepartureTime() + transitRoute.getStop(routeProfile.get(0)).getDepartureOffset().seconds());
 					dep.setVehicleId(departure.getVehicleId());
 					
 					mergedTransitRoute.addDeparture(dep);

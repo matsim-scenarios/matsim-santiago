@@ -326,12 +326,12 @@ public class TransitScheduleSimplifierAndreas{
 		TransitRouteStop end = null;
 		
 		for(TransitRouteStop stop : transitRoute.getStops()){
-			if(stop.getArrivalOffset() < startOffset){
-				startOffset = stop.getArrivalOffset();
+			if(stop.getArrivalOffset().seconds() < startOffset){
+				startOffset = stop.getArrivalOffset().seconds();
 				start = stop;
 			}
-			if(stop.getArrivalOffset() > endOffset){
-				endOffset = stop.getArrivalOffset();
+			if(stop.getArrivalOffset().seconds() > endOffset){
+				endOffset = stop.getArrivalOffset().seconds();
 				end = stop;
 			}
 		}
@@ -538,9 +538,9 @@ public class TransitScheduleSimplifierAndreas{
 			for(int j = 0; j < listOfRoutes.length; j++){
 				
 				TransitRouteStop stop = transitRoutes.get(Id.create(listOfRoutes[j], TransitRoute.class)).getStops().get(i);
-				arrivalOffset += stop.getArrivalOffset();
+				arrivalOffset += stop.getArrivalOffset().seconds();
 				arrCounter++;
-				departureOffset += stop.getDepartureOffset();
+				departureOffset += stop.getDepartureOffset().seconds();
 				depCounter++;
 				
 			}
@@ -585,7 +585,7 @@ public class TransitScheduleSimplifierAndreas{
 							Integer.toString(mergedTransitRoute.getDepartures().size());
 					
 					Departure dep = factory.createDeparture(Id.create(departureId, Departure.class),
-							departure.getDepartureTime() + transitRoute.getStop(startTransitRouteStop.getStopFacility()).getDepartureOffset());
+							departure.getDepartureTime() + transitRoute.getStop(startTransitRouteStop.getStopFacility()).getDepartureOffset().seconds());
 					dep.setVehicleId(departure.getVehicleId());
 					
 					mergedTransitRoute.addDeparture(dep);

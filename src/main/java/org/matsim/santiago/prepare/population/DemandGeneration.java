@@ -169,8 +169,8 @@ public class DemandGeneration {
 							Activity actIn = (Activity)pe;
 							Activity actOut = originalPopulation.getFactory().createActivityFromCoord(actIn.getType(), actIn.getCoord());
 							planOut.addActivity(actOut);
-							actOut.setEndTime(actIn.getEndTime());
-							actOut.setStartTime(actIn.getStartTime());
+							actOut.setEndTime(actIn.getEndTime().seconds());
+							actOut.setStartTime(actIn.getStartTime().seconds());
 					}
 				}
 					pOut.addPlan(planOut);

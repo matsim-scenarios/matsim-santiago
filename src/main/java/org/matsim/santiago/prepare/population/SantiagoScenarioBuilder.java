@@ -20,11 +20,7 @@
 package org.matsim.santiago.prepare.population;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -304,24 +300,25 @@ public class SantiagoScenarioBuilder {
 						addPerson = false;
 						break;
 					}
-					if(act.getStartTime() != Time.UNDEFINED_TIME){
-						if(act.getStartTime() > lastStartTime && act.getStartTime() <= 24*3600){
-							lastStartTime = act.getStartTime();
+					if(act.getStartTime().isDefined() ) {// != Time.UNDEFINED_TIME){
+						if(act.getStartTime().seconds() > lastStartTime && act.getStartTime().seconds() <= 24*3600){
+							lastStartTime = act.getStartTime().seconds();
 						} else{
 							addPerson = false;
 							break;
 						}
 					}
-					if(act.getEndTime() != Time.UNDEFINED_TIME){
-						if(act.getEndTime() > lastEndTime && act.getEndTime() <= 24*3600){
-							lastEndTime = act.getEndTime();
+					if(act.getEndTime().isDefined() ) {// != Time.UNDEFINED_TIME){
+						if(act.getEndTime().seconds() > lastEndTime && act.getEndTime().seconds() <= 24*3600){
+							lastEndTime = act.getEndTime().seconds();
 						} else{
 							addPerson = false;
 							break;
 						}
 					}
-					if(act.getStartTime() != Time.UNDEFINED_TIME && act.getEndTime() != Time.UNDEFINED_TIME){
-						if(act.getStartTime() > act.getEndTime()){
+//					if(act.getStartTime() != Time.UNDEFINED_TIME && act.getEndTime() != Time.UNDEFINED_TIME){
+					if(act.getStartTime().isDefined() && act.getEndTime().isDefined() ) {
+						if(act.getStartTime().seconds() > act.getEndTime().seconds()){
 							addPerson = false;
 							break;
 						}
@@ -409,23 +406,24 @@ public class SantiagoScenarioBuilder {
 			for(PlanElement pe : planElements){
 				if(pe instanceof Activity){
 					Activity act = (Activity)pe;
-					if(act.getStartTime() != Time.UNDEFINED_TIME){
-						if(act.getStartTime() >= lastStartTime && act.getStartTime() <= 24*3600){
-							lastStartTime = act.getStartTime();
+					if(act.getStartTime().isDefined() ) { // != Time.UNDEFINED_TIME){
+						if(act.getStartTime().seconds() >= lastStartTime && act.getStartTime().seconds() <= 24*3600){
+							lastStartTime = act.getStartTime().seconds();
 						} else {
 							break;
 						}
 					}
-					if(act.getEndTime() != Time.UNDEFINED_TIME){
-						if(act.getEndTime() >= lastEndTime && act.getEndTime() <= 24*3600){
-							lastEndTime = act.getEndTime();
+					if(act.getEndTime().isDefined() ) { // != Time.UNDEFINED_TIME){
+						if(act.getEndTime().seconds() >= lastEndTime && act.getEndTime().seconds() <= 24*3600){
+							lastEndTime = act.getEndTime().seconds();
 						} else{
 							break;
 						}
 					}
-					
-					if(act.getStartTime() != Time.UNDEFINED_TIME && act.getEndTime() != Time.UNDEFINED_TIME){
-						if(act.getStartTime() > act.getEndTime()){
+
+//					if(act.getStartTime() != Time.UNDEFINED_TIME && act.getEndTime() != Time.UNDEFINED_TIME){
+					if(act.getStartTime().isDefined()&& act.getEndTime().isDefined() ) {
+						if(act.getStartTime().seconds() > act.getEndTime().seconds() ){
 							break;
 						}
 					}
@@ -614,7 +612,8 @@ public class SantiagoScenarioBuilder {
 		cc.setRunId(null);	//should not be "", because then all file names start with a dot. --> null or any number. (KT, 2015-08-17) 
 		cc.setWriteEventsInterval(writeStuffInterval);
 		cc.setWritePlansInterval(writeStuffInterval);
-		cc.setSnapshotFormat(CollectionUtils.stringToSet("otfvis"));
+//		cc.setSnapshotFormat(CollectionUtils.stringToSet("otfvis"));
+		cc.setSnapshotFormat( Collections.singletonList( ControlerConfigGroup.SnapshotFormat.otfvis ) );
 		cc.setWriteSnapshotsInterval(0);
 	}
 	
@@ -781,8 +780,10 @@ public class SantiagoScenarioBuilder {
 		if(prepareForModeChoice) plans.setInputPersonAttributeFile(pathForMatsim + "input/" +"agentAttributes.xml");
 		plans.setInputFile(pathForMatsim + "input/" + "plans_final" + ".xml.gz");
 		plans.setNetworkRouteType(NetworkRouteType.LinkNetworkRoute);
-		plans.setSubpopulationAttributeName(SubpopulationName.carUsers); 
 		plans.setRemovingUnneccessaryPlanAttributes(true);
+//		plans.setSubpopulationAttributeName(SubpopulationName.carUsers);
+		throw new RuntimeException( "The above setting does not exist any more.  It might work anyways.  But it needs to be checked.  " +
+							    "Maybe the subpopulation attribute name is used in input files.  kai, jun'22" );
 	}
 	
 	private void setPlansCalcRouteParameters(PlansCalcRouteConfigGroup pcr){

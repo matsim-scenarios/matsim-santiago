@@ -20,13 +20,7 @@
 package org.matsim.santiago.prepare.population.trying;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-import java.util.SortedMap;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -207,12 +201,12 @@ public class ScenarioBuilderTry {
 					} else if (ii  == selectedPlan.getPlanElements().size() - 1){ //last activity
 
 					} else { // all intermediate activities
-						if(act.getStartTime() < 0. || act.getEndTime() < 0.){
+						if(act.getStartTime().seconds() < 0. || act.getEndTime().seconds() < 0.){
 							persons2Remove.add(person.getId());
 							smallerZeroTimeCounter++;
 							break;
 						}
-						if(act.getStartTime() > act.getEndTime()){
+						if(act.getStartTime().seconds() > act.getEndTime().seconds()){
 							log.info("Start time " + act.getStartTime() + "; End time " + act.getEndTime());
 							persons2Remove.add(person.getId());
 							startAfterEndTimeCounter++;
@@ -252,7 +246,7 @@ public class ScenarioBuilderTry {
 			if(firstAct.getType().equals(lastAct.getType())){
 				pop1.addPerson(person);
 			} else{
-				if(lastAct.getStartTime() > Time.MIDNIGHT || lastAct.getEndTime() > Time.MIDNIGHT){
+				if(lastAct.getStartTime().seconds() > Time.MIDNIGHT || lastAct.getEndTime().seconds() > Time.MIDNIGHT){
 					counter ++;
 				} else {
 					pop2.addPerson(person);
@@ -350,9 +344,10 @@ public class ScenarioBuilderTry {
 				if(pe instanceof Activity){
 					Activity act = (Activity) pe;
 					// TODO: this should not happen any more after using ActivityClassifier?
-					if(act.getStartTime() != Time.UNDEFINED_TIME && act.getEndTime() != Time.UNDEFINED_TIME){
+//					if(act.getStartTime() != Time.UNDEFINED_TIME && act.getEndTime() != Time.UNDEFINED_TIME){
+					if(act.getStartTime().isDefined() && act.getEndTime().isDefined() ){
 						// TODO: should also not happen any more.
-						if(act.getEndTime() - act.getStartTime() == 0){
+						if(act.getEndTime().seconds() - act.getStartTime().seconds() == 0){
 							timeShift += 1800.;
 						}
 					}
@@ -367,11 +362,11 @@ public class ScenarioBuilderTry {
 			double delta = 0.;
 			while(delta == 0.){
 				delta = createRandomEndTime(random);
-				if(firstAct.getEndTime() + delta + timeShift < 0.){ //avoid shifting A0 end time before midnight
+				if(firstAct.getEndTime().seconds() + delta + timeShift < 0.){ //avoid shifting A0 end time before midnight
 					delta = 0.;
 				}
 				if(!firstActType.equals(lastActType)){ 							    //if A0neAX, ...
-					if(lastAct.getStartTime() + delta + timeShift > Time.MIDNIGHT){ //...avoid shifting start time of AX after midnight
+					if(lastAct.getStartTime().seconds() + delta + timeShift > Time.MIDNIGHT){ //...avoid shifting start time of AX after midnight
 						delta = 0.;
 					}
 				} else { //if A0eAX, ...
@@ -380,8 +375,8 @@ public class ScenarioBuilderTry {
 				// if an activity end time for last activity exists, it should be 24:00:00
 				// in order to avoid zero activity durations, this check is done
 				// TODO: I dont understand this...
-				if(lastAct.getEndTime() != Time.UNDEFINED_TIME){
-					if(lastAct.getStartTime() + delta + timeShift >= lastAct.getEndTime()){
+				if(lastAct.getEndTime().isDefined() ) { // != Time.UNDEFINED_TIME){
+					if(lastAct.getStartTime().seconds() + delta + timeShift >= lastAct.getEndTime().seconds()){
 						delta = 0.;
 					}
 				}
@@ -393,10 +388,10 @@ public class ScenarioBuilderTry {
 					Activity act = (Activity)pe;
 					if(!act.getType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)){
 						if(pes.indexOf(act) > 0){ //set start times for all but the first activity 
-							act.setStartTime(act.getStartTime() + delta);
+							act.setStartTime(act.getStartTime().seconds() + delta);
 						}
 						if(pes.indexOf(act) < pes.size()-1){ //set end times for all but the last activity
-							act.setEndTime(act.getEndTime() + delta);
+							act.setEndTime(act.getEndTime().seconds() + delta);
 						}
 					} else {
 						// do nothing
@@ -474,7 +469,7 @@ public class ScenarioBuilderTry {
 		cc.setRunId(null);	//should not be "", because then all file names start with a dot. --> null or any number. (KT, 2015-08-17) 
 		cc.setWriteEventsInterval(writeStuffInterval);
 		cc.setWritePlansInterval(writeStuffInterval);
-		cc.setSnapshotFormat(CollectionUtils.stringToSet("otfvis"));
+		cc.setSnapshotFormat( Collections.singletonList( ControlerConfigGroup.SnapshotFormat.otfvis ) );
 		cc.setWriteSnapshotsInterval(0);
 	}
 	
@@ -620,8 +615,10 @@ public class ScenarioBuilderTry {
 		if(prepareForModeChoice) plans.setInputPersonAttributeFile(pathForMatsim + "input/" +"agentAttributes.xml");
 		plans.setInputFile(pathForMatsim + "input/" + "plans_final" + ".xml.gz");
 		plans.setNetworkRouteType(NetworkRouteType.LinkNetworkRoute);
-		plans.setSubpopulationAttributeName(SubpopulationName.carUsers); 
 		plans.setRemovingUnneccessaryPlanAttributes(true);
+//		plans.setSubpopulationAttributeName(SubpopulationName.carUsers);
+		throw new RuntimeException( "the subpopulation attribute name is no longer settable.  It might just work anyways, " +
+							    "but not if it is in some population xml file" );
 	}
 	
 	private void setPlansCalcRouteParameters(PlansCalcRouteConfigGroup pcr){
@@ -969,23 +966,24 @@ public class ScenarioBuilderTry {
 					for(PlanElement pe : planElements){
 						if(pe instanceof Activity){
 							Activity act = (Activity)pe;
-							if(act.getStartTime() != Time.UNDEFINED_TIME){
-								if(act.getStartTime() >= lastStartTime && act.getStartTime() <= 24*3600){
-									lastStartTime = act.getStartTime();
+							if(act.getStartTime().isDefined() ) { // != Time.UNDEFINED_TIME){
+								if(act.getStartTime().seconds() >= lastStartTime && act.getStartTime().seconds() <= 24*3600){
+									lastStartTime = act.getStartTime().seconds();
 								} else {
 									break;
 								}
 							}
-							if(act.getEndTime() != Time.UNDEFINED_TIME){
-								if(act.getEndTime() >= lastEndTime && act.getEndTime() <= 24*3600){
-									lastEndTime = act.getEndTime();
+							if(act.getEndTime().isDefined() ) {// != Time.UNDEFINED_TIME){
+								if(act.getEndTime().seconds() >= lastEndTime && act.getEndTime().seconds() <= 24*3600){
+									lastEndTime = act.getEndTime().seconds();
 								} else{
 									break;
 								}
 							}
-							
-							if(act.getStartTime() != Time.UNDEFINED_TIME && act.getEndTime() != Time.UNDEFINED_TIME){
-								if(act.getStartTime() > act.getEndTime()){
+
+//							if(act.getStartTime() != Time.UNDEFINED_TIME && act.getEndTime() != Time.UNDEFINED_TIME){
+							if(act.getStartTime().isDefined()&& act.getEndTime().isDefined() ){
+								if(act.getStartTime().seconds() > act.getEndTime().seconds() ){
 									break;
 								}
 							}

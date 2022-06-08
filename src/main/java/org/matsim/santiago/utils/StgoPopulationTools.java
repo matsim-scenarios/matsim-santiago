@@ -69,18 +69,18 @@ public class StgoPopulationTools {
 					double startTime = Double.NEGATIVE_INFINITY;
 					double endTime = Double.NEGATIVE_INFINITY;
 				
-					if (act.getStartTime() >= 0. && act.getStartTime() <= 24 * 3600.) {
-						startTime = act.getStartTime();
+					if (act.getStartTime().seconds() >= 0. && act.getStartTime().seconds() <= 24 * 3600.) {
+						startTime = act.getStartTime().seconds();
 					} else {
 						
 						// trying to identify the activity start time via the arrival time...
 						double arrivalTime = Double.NEGATIVE_INFINITY;
 						if (previousLeg != null) {
-							if (previousLeg.getDepartureTime() >= 0. && previousLeg.getDepartureTime() <= 24 * 3600. && previousLeg.getTravelTime() >= 0. && previousLeg.getTravelTime() <= 24 * 3600.) {
-								arrivalTime = previousLeg.getDepartureTime() + previousLeg.getTravelTime();
+							if (previousLeg.getDepartureTime().seconds() >= 0. && previousLeg.getDepartureTime().seconds() <= 24 * 3600. && previousLeg.getTravelTime().seconds() >= 0. && previousLeg.getTravelTime().seconds() <= 24 * 3600.) {
+								arrivalTime = previousLeg.getDepartureTime().seconds() + previousLeg.getTravelTime().seconds();
 							} else {
-								if (previousLeg.getRoute().getTravelTime() >= 0. && previousLeg.getRoute().getTravelTime() <= 24 * 3600.) {
-									arrivalTime = previousActEndTime + previousLeg.getRoute().getTravelTime();
+								if (previousLeg.getRoute().getTravelTime().seconds() >= 0. && previousLeg.getRoute().getTravelTime().seconds() <= 24 * 3600.) {
+									arrivalTime = previousActEndTime + previousLeg.getRoute().getTravelTime().seconds();
 								} else {
 									log.warn("No meaningful activity start time and arrival time identified even though it is not the first activity...");
 								}
@@ -95,8 +95,8 @@ public class StgoPopulationTools {
 					}
 					
 					
-					if (act.getEndTime() >= 0. && act.getEndTime() <= 24 * 3600.) {
-						endTime = act.getEndTime();
+					if (act.getEndTime().seconds() >= 0. && act.getEndTime().seconds() <= 24 * 3600.) {
+						endTime = act.getEndTime().seconds();
 					} else {
 						// Last activity!
 						

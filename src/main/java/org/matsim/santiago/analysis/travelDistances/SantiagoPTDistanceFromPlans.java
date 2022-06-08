@@ -15,6 +15,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -51,7 +52,7 @@ public class SantiagoPTDistanceFromPlans {
 			String lastAct="";
 			String currentAct="";
 
-			double lastDepartureTime=0;
+			OptionalTime lastDepartureTime= OptionalTime.defined( 0. );
 
 			double distanceTravelled = 0;			
 			String departureTimeTransitTrip = "";
@@ -63,12 +64,12 @@ public class SantiagoPTDistanceFromPlans {
 
 				if (pe instanceof Activity){
 					currentAct=((Activity) pe).getType();
-					double currentDepartureTime = ((Activity) pe).getEndTime();					
+					OptionalTime currentDepartureTime = ((Activity) pe).getEndTime();
 
 					/*start of the trip -> departureTime should be stored -> same as lastAct endTime*/
 					if (!lastAct.equals("pt interaction")&&currentAct.equals("pt interaction")){
 
-						if(lastDepartureTime==Time.UNDEFINED_TIME){
+						if(lastDepartureTime.isUndefined() ) {//==Time.UNDEFINED_TIME){
 							departureTimeTransitTrip="noInfo";
 						} else {
 
@@ -81,7 +82,7 @@ public class SantiagoPTDistanceFromPlans {
 					else if (!lastAct.equals("pt interaction")&&!currentAct.equals("pt interaction")){
 						
 						if(modes.contains(TransportMode.pt)||modes.contains(TransportMode.transit_walk)){
-							if(lastDepartureTime==Time.UNDEFINED_TIME){
+							if(lastDepartureTime.isUndefined() ) {//==Time.UNDEFINED_TIME){
 								departureTimeTransitTrip="noInfo";
 							} else {
 								
