@@ -68,7 +68,6 @@ public class SantiagoTrafficVolumesAnalysis {
 			for (Link link: links){										
 				writer.write(link.getId() +"\t"+  link.getLength() + "\t" + link.getCapacity() + "\n");
 			}
-			writer.close();
 		} catch (Exception e) {
 			throw new RuntimeException("Data is not written. Reason "+e );
 		}		

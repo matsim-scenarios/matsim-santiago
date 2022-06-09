@@ -59,8 +59,8 @@ public class DvrpRouteConverter {
 
 					if (modesToDvrpMode.contains(leg.getMode())) {
 						leg.setMode(dvrpMode);
-						leg.setDepartureTime(Time.UNDEFINED_TIME);
-						leg.setTravelTime(Time.UNDEFINED_TIME);
+						leg.setDepartureTimeUndefined();
+						leg.setTravelTimeUndefined();
 						leg.setRoute(null);
 					}
 				}

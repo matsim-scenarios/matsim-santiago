@@ -324,10 +324,15 @@ public class ScenarioBuilderTry {
 				params.setTypicalDuration(acts.get(act));
 				// Minimum duration is now specified by typical duration.
 //				params.setMinimalDuration(acts.get(act).getSecond());
-				params.setClosingTime(Time.UNDEFINED_TIME);
-				params.setEarliestEndTime(Time.UNDEFINED_TIME);
-				params.setLatestStartTime(Time.UNDEFINED_TIME);
-				params.setOpeningTime(Time.UNDEFINED_TIME);
+
+//				params.setClosingTime(Time.UNDEFINED_TIME);
+//				params.setEarliestEndTime(Time.UNDEFINED_TIME);
+//				params.setLatestStartTime(Time.UNDEFINED_TIME);
+//				params.setOpeningTime(Time.UNDEFINED_TIME);
+				// Since the introduction of OptionalTime into MATSim, setting the above to undefined is no longer possible.  Needs to be fixed.
+				// In the meantime: Since in the above params is newly created, those values are initialized with undefined anyways.
+				// kai, jun'22
+
 				params.setTypicalDurationScoreComputation(TypicalDurationScoreComputation.relative);
 				config.planCalcScore().addActivityParams(params);
 			}
