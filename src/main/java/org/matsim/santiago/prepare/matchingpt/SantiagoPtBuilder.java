@@ -12,7 +12,7 @@ import java.time.LocalDate;
 
 import org.apache.log4j.Logger;
 
-import com.conveyal.gtfs.GTFSFeed;
+//import com.conveyal.gtfs.GTFSFeed;
 
 
 import org.matsim.santiago.utils.Gbl;
@@ -34,12 +34,13 @@ public class SantiagoPtBuilder {
 	public static void main(String[] args) {
 		
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		GTFSFeed feed = GTFSFeed.fromFile(fromFile);
-
-		CoordinateTransformation transform  = TransformationFactory.getCoordinateTransformation("EPSG:4326", SantiagoScenarioConstants.toCRS);
-		boolean useExtendedRouteTypes = false;
-
-		throw new RuntimeException( Gbl.MATSIM_GTFS_MSG );
+		throw new RuntimeException( Gbl.CONVEYAL_MSG + " " + Gbl.MATSIM_GTFS_MSG);
+//		GTFSFeed feed = GTFSFeed.fromFile(fromFile);
+//
+//		CoordinateTransformation transform  = TransformationFactory.getCoordinateTransformation("EPSG:4326", SantiagoScenarioConstants.toCRS);
+//		boolean useExtendedRouteTypes = false;
+//
+//		throw new RuntimeException( Gbl.MATSIM_GTFS_MSG );
 
 //		GtfsConverter santiagoConverter = new GtfsConverter(feed, scenario, transform, useExtendedRouteTypes);
 //		santiagoConverter.setDate(LocalDate.of(2013, 6, 1)) ;

@@ -82,17 +82,17 @@
 					<artifactId>hmm-lib</artifactId>
 					<version>0.2.0</version>
 				</dependency> -->
-		<dependency>
-			<groupId>com.conveyal</groupId>
-			<artifactId>gtfs-lib</artifactId>
-			<version>1.1.0</version>
-			<exclusions>
-				<exclusion>
-					<artifactId>guava</artifactId>
-					<groupId>com.google.guava</groupId>
-				</exclusion>
-			</exclusions>
-		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>com.conveyal</groupId>-->
+<!--			<artifactId>gtfs-lib</artifactId>-->
+<!--			<version>1.1.0</version>-->
+<!--			<exclusions>-->
+<!--				<exclusion>-->
+<!--					<artifactId>guava</artifactId>-->
+<!--					<groupId>com.google.guava</groupId>-->
+<!--				</exclusion>-->
+<!--			</exclusions>-->
+<!--		</dependency>-->
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>emissions</artifactId>
@@ -125,10 +125,17 @@
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
+			<artifactId>cadytsIntegration</artifactId>
+			<version>${matsim.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.matsim.contrib</groupId>
 			<artifactId>vsp</artifactId>
 			<version>${matsim.version}</version>
-			<scope>compile</scope>
 		</dependency>
+<!--		It seems that the 12.0 version of the vsp contrib pulls in 12.0-SNAPSHOT dependencies on other contribs.  Don't know why.  kai, jun'22-->
+		
 		<!-- 		<dependency> -->
 		<!-- 			<groupId>org.matsim.vsp.vsp-playgrounds</groupId> -->
 		<!-- 			<artifactId>benjamin</artifactId> -->
@@ -179,35 +186,35 @@
 	</dependencies>
 	<build>
 		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-enforcer-plugin</artifactId>
-				<version>3.0.0</version>
-				<executions>
-					<execution>
-						<id>enforce</id>
-						<goals>
-							<goal>enforce</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<rules>
-						<requireUpperBoundDeps/>
-						<banDuplicatePomDependencyVersions/>
-						<requireReleaseDeps>
-							<failWhenParentIsSnapshot>false</failWhenParentIsSnapshot>
-							<excludes>
-								<exclude>org.matsim:*</exclude>
-								<exclude>org.matsim.contrib:*</exclude>
-							</excludes>
-						</requireReleaseDeps>
-						<requireMavenVersion>
-							<version>3.6.3</version>
-						</requireMavenVersion>
-					</rules>
-				</configuration>
-			</plugin>
+<!--			<plugin>-->
+<!--				<groupId>org.apache.maven.plugins</groupId>-->
+<!--				<artifactId>maven-enforcer-plugin</artifactId>-->
+<!--				<version>3.0.0</version>-->
+<!--				<executions>-->
+<!--					<execution>-->
+<!--						<id>enforce</id>-->
+<!--						<goals>-->
+<!--							<goal>enforce</goal>-->
+<!--						</goals>-->
+<!--					</execution>-->
+<!--				</executions>-->
+<!--				<configuration>-->
+<!--					<rules>-->
+<!--						<requireUpperBoundDeps/>-->
+<!--						<banDuplicatePomDependencyVersions/>-->
+<!--						<requireReleaseDeps>-->
+<!--							<failWhenParentIsSnapshot>false</failWhenParentIsSnapshot>-->
+<!--							<excludes>-->
+<!--								<exclude>org.matsim:*</exclude>-->
+<!--								<exclude>org.matsim.contrib:*</exclude>-->
+<!--							</excludes>-->
+<!--						</requireReleaseDeps>-->
+<!--						<requireMavenVersion>-->
+<!--							<version>3.6.3</version>-->
+<!--						</requireMavenVersion>-->
+<!--					</rules>-->
+<!--				</configuration>-->
+<!--			</plugin>-->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
