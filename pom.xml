@@ -22,21 +22,26 @@
 	<repositories>
 		<!--Note that in general repositories are not transitive, so they need to be repeated at every level where needed.-->
 		<repository>
+			<!-- Repository for MATSim (MATSim is not on Maven central, releases and snapshots) -->
+			<id>matsim</id>
+			<url>https://repo.matsim.org/repository/matsim</url>
+		</repository>
+		<repository>
 			<!-- Geotools is not on Maven central -->
 			<id>osgeo</id>
 			<name>Geotools repository</name>
 			<url>http://download.osgeo.org/webdav/geotools</url>
 		</repository>
-		<repository>
-			<!-- Repository for MATSim releases (MATSim is not on Maven central) -->
-			<id>matsim</id>
-			<url>https://dl.bintray.com/matsim/matsim</url>
-		</repository>
-		<repository>
-			<!-- For MATSim snapshots: -->
-			<id>ojo-snapshots</id>
-			<url>http://oss.jfrog.org/libs-snapshot</url>
-		</repository>
+<!--		<repository>-->
+<!--			&lt;!&ndash; Repository for MATSim releases (MATSim is not on Maven central) &ndash;&gt;-->
+<!--			<id>matsim</id>-->
+<!--			<url>https://dl.bintray.com/matsim/matsim</url>-->
+<!--		</repository>-->
+<!--		<repository>-->
+<!--			&lt;!&ndash; For MATSim snapshots: &ndash;&gt;-->
+<!--			<id>ojo-snapshots</id>-->
+<!--			<url>http://oss.jfrog.org/libs-snapshot</url>-->
+<!--		</repository>-->
 <!--		<repository>-->
 <!--			<id>hmm-lib-snapshots</id>-->
 <!--			<url>https://raw.github.com/bmwcarit/hmm-lib/mvn-snapshots/</url>-->
@@ -77,6 +82,12 @@
 			<groupId>com.conveyal</groupId>
 			<artifactId>gtfs-lib</artifactId>
 			<version>1.1.0</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>guava</artifactId>
+					<groupId>com.google.guava</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
@@ -135,15 +146,19 @@
 <!--			<scope>compile</scope>-->
 <!--		</dependency>-->
 
-		<dependency>
-			<groupId>org.matsim.contrib</groupId>
-			<artifactId>matsim-gtfs</artifactId>
-			<version>0.9.0-SNAPSHOT</version>
-		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>org.matsim.contrib</groupId>-->
+<!--			<artifactId>matsim-gtfs</artifactId>-->
+<!--&lt;!&ndash;			<version>0.8.0</version>&ndash;&gt;-->
+<!--			<version>0.9.0-SNAPSHOT</version>-->
+<!--&lt;!&ndash;			yyyy 0.8.0 is the only version I find in repo.matsim.org.  But it is not working here.  The snapshot version may just be in my local cache?  kai, jun'22  &ndash;&gt;-->
+<!--		</dependency>-->
+<!--		(There is no newer version, but that old version brings in maven dependencies to old libraries, which cause problems elsewhere.  kai, jun'22)-->
+
 		<dependency>
 			<groupId>org.locationtech.jts</groupId>
 			<artifactId>jts-core</artifactId>
-			<version>1.16.1</version>
+			<version>1.18.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim</groupId>
@@ -160,6 +175,35 @@
 	</dependencies>
 	<build>
 		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-enforcer-plugin</artifactId>
+				<version>3.0.0</version>
+				<executions>
+					<execution>
+						<id>enforce</id>
+						<goals>
+							<goal>enforce</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<rules>
+						<requireUpperBoundDeps/>
+						<banDuplicatePomDependencyVersions/>
+						<requireReleaseDeps>
+							<failWhenParentIsSnapshot>false</failWhenParentIsSnapshot>
+							<excludes>
+								<exclude>org.matsim:*</exclude>
+								<exclude>org.matsim.contrib:*</exclude>
+							</excludes>
+						</requireReleaseDeps>
+						<requireMavenVersion>
+							<version>3.6.3</version>
+						</requireMavenVersion>
+					</rules>
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>

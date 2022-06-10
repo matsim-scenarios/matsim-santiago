@@ -179,7 +179,9 @@
 		<param name="removingUnnecessaryPlanAttributes" value="true" />
 
 		<!-- Name of the (Object)Attribute defining the subpopulation to which pertains a Person (as freight, through traffic, etc.). The attribute must be of String type.  Change away from default only in desperate situations. -->
-		<param name="subpopulationAttributeName" value="carUsers" />
+<!--		<param name="subpopulationAttributeName" value="carUsers" />-->
+<!--		This does not exist any more.  The attributeName is now fixed at "subpopulation", and there is PopulationUtils#set/getSubpopulation(person, ...) .  -->
+<!--		I can't say if removing the above information from the code will change it or not.  kai, jun'22-->
 	</module>
 
 <!-- ====================================================================== -->

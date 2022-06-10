@@ -44,10 +44,12 @@ import org.matsim.contrib.roadpricing.RoadPricingModule;
 import org.matsim.core.config.CommandLine;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.MatsimServices;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
@@ -57,6 +59,8 @@ import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.modules.SubtourModeChoice;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
+import org.matsim.core.router.MainModeIdentifier;
+import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
@@ -93,6 +97,8 @@ public class SantiagoScenarioRunner {
 
 	}
 	static void run( Config config, String[] args ){
+
+
 		CommandLine cmd = ConfigUtils.getCommandLine( args ) ;
 
 		Scenario scenario = ScenarioUtils.loadScenario( config );
@@ -163,6 +169,13 @@ public class SantiagoScenarioRunner {
 			} ) ;
 
 		}
+
+		controler.addOverridingModule( new AbstractModule(){
+			@Override public void install(){
+				this.bind( MainModeIdentifier.class ).to( MainModeIdentifierImpl.class );
+			}
+		} );
+		config.plans().setHandlingOfPlansWithoutRoutingMode( PlansConfigGroup.HandlingOfPlansWithoutRoutingMode.useMainModeIdentifier );
 
 		//Run!
 		controler.run();

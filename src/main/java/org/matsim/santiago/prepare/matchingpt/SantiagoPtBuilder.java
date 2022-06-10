@@ -1,7 +1,7 @@
 package org.matsim.santiago.prepare.matchingpt;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.gtfs.GtfsConverter;
+//import org.matsim.contrib.gtfs.GtfsConverter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -15,6 +15,7 @@ import org.apache.log4j.Logger;
 import com.conveyal.gtfs.GTFSFeed;
 
 
+import org.matsim.santiago.utils.Gbl;
 import org.matsim.santiago.utils.SantiagoScenarioConstants;
 
 /**
@@ -37,12 +38,14 @@ public class SantiagoPtBuilder {
 
 		CoordinateTransformation transform  = TransformationFactory.getCoordinateTransformation("EPSG:4326", SantiagoScenarioConstants.toCRS);
 		boolean useExtendedRouteTypes = false;
-		
-		GtfsConverter santiagoConverter = new GtfsConverter(feed, scenario, transform, useExtendedRouteTypes);
-		santiagoConverter.setDate(LocalDate.of(2013, 6, 1)) ;
-		santiagoConverter.convert();
-		TransitScheduleWriter writer = new TransitScheduleWriter(scenario.getTransitSchedule());
-		writer.writeFile(toFile);
+
+		throw new RuntimeException( Gbl.MATSIM_GTFS_MSG );
+
+//		GtfsConverter santiagoConverter = new GtfsConverter(feed, scenario, transform, useExtendedRouteTypes);
+//		santiagoConverter.setDate(LocalDate.of(2013, 6, 1)) ;
+//		santiagoConverter.convert();
+//		TransitScheduleWriter writer = new TransitScheduleWriter(scenario.getTransitSchedule());
+//		writer.writeFile(toFile);
 		
 				
 	}

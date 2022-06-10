@@ -66,6 +66,8 @@ public class SantiagoScenarioRunnerTest{
 
 			config.transit().setUsingTransitInMobsim( false ); // !!!
 
+			config.controler().setOutputDirectory( utils.getOutputDirectory() );
+
 			SantiagoScenarioRunner.run( config, args) ;
 
 		} catch ( Exception ee ) {
@@ -99,6 +101,8 @@ public class SantiagoScenarioRunnerTest{
 
 			config.qsim().setFlowCapFactor( 0.01 );
 			config.qsim().setStorageCapFactor( 0.01 );
+
+			config.controler().setOutputDirectory( utils.getOutputDirectory() );
 
 			SantiagoScenarioRunner.run(  config, args );
 
@@ -135,6 +139,8 @@ public class SantiagoScenarioRunnerTest{
 
 			config.qsim().setFlowCapFactor( 0.01 );
 			config.qsim().setStorageCapFactor( 0.01 );
+
+			config.controler().setOutputDirectory( utils.getOutputDirectory() );
 
 			SantiagoScenarioRunner.run(  config, args );
 
