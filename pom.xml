@@ -50,14 +50,18 @@
 <!--				<updatePolicy>always</updatePolicy>-->
 <!--			</snapshots>-->
 <!--		</repository>-->
-		<repository>
-			<id>conveyal</id>
-			<name>Conveyal Maven Repository</name>
-			<url>http://maven.conveyal.com/</url>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-		</repository>
+
+<!--		<repository>-->
+<!--			<id>conveyal</id>-->
+<!--			<name>Conveyal Maven Repository</name>-->
+<!--			<url>http://maven.conveyal.com/</url>-->
+<!--			<snapshots>-->
+<!--				<enabled>true</enabled>-->
+<!--			</snapshots>-->
+<!--		</repository>-->
+<!--		not working.  kai, jun'22-->
+
+
 		<!-- for dependencies of osm-network-reader -->
 		<repository>
 			<id>topobyte</id>
