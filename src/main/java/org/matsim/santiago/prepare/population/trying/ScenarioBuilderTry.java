@@ -701,7 +701,7 @@ public class ScenarioBuilderTry {
 		qsim.setTrafficDynamics(TrafficDynamics.queue);
 		qsim.setUsePersonIdForMissingVehicleId(true);
 		qsim.setUsingFastCapacityUpdate(false);
-		qsim.setUsingThreadpool(false);
+//		qsim.setUsingThreadpool(false);
 		qsim.setVehicleBehavior(VehicleBehavior.teleport);
 	}
 	

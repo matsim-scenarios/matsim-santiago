@@ -53,6 +53,8 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
+import org.matsim.core.population.algorithms.PermissibleModesCalculator;
+import org.matsim.core.population.algorithms.PermissibleModesCalculatorImpl;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl.Builder;
 import org.matsim.core.replanning.modules.ReRoute;
@@ -355,9 +357,11 @@ public class SantiagoScenarioRunner {
 			Log.info("Available modes are " + availableModes);
 			Log.info("Chain-based modes are " + chainBasedModes);
 			final Builder builder = new Builder(new RandomPlanSelector<Plan, Person>());
-			builder.addStrategyModule(new SubtourModeChoice(scenario.getConfig().global().getNumberOfThreads(), availableModes, chainBasedModes, false,
-				  0.0, // using value of 0.0 (=default) for backward compatibility
-				  tripRouterProvider));
+//			new SubtourModeChoice(scenario.getConfig().global().getNumberOfThreads(), availableModes,
+//					chainBasedModes, false, 0.0, // using value of 0.0 (=default) for backward compatibility
+//					tripRouterProvider));
+			builder.addStrategyModule(new SubtourModeChoice(scenario.getConfig().global(), scenario.getConfig().subtourModeChoice(),
+					new PermissibleModesCalculatorImpl(scenario.getConfig()) ) );
 			builder.addStrategyModule(new ReRoute(scenario, tripRouterProvider));
 			return builder.build();
 		}
